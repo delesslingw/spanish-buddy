@@ -1,0 +1,48 @@
+{
+    "name": "spanish-buddy",
+    "version": "0.0.1",
+    "description": "",
+    "scripts": {
+        "start": "concurrently \"npm run start-react\" \"npm run start-electron\"",
+        "start-react": "cd renderer && npm start",
+        "start-electron": "wait-on http://localhost:3000 && electron .",
+        "build": "npm run build-react && electron-builder --win",
+        "build-react": "cd renderer && npm run build"
+    },
+    "main": "main/main.js",
+    "keywords": [],
+    "author": "delesslin",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "^9.1.2",
+        "electron": "^35.0.3",
+        "electron-builder": "^25.1.8",
+        "wait-on": "^8.0.3"
+    },
+    "build": {
+        "appId": "com.yourdomain.spanishbuddy",
+        "productName": "Spanish Buddy",
+        "directories": {
+            "buildResources": "assets",
+            "output": "dist"
+        },
+        "files": [
+            "main/**/*",
+            "sessions/**/*",
+            "renderer/build/**/*",
+            "package.json"
+        ],
+        "extraMetadata": {
+            "main": "main/main.js"
+        },
+        "mac": {
+            "target": "dmg"
+        },
+        "win": {
+            "target": "nsis"
+        },
+        "linux": {
+            "target": "AppImage"
+        }
+    }
+}
