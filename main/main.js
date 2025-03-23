@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const { callOllamaAPI } = require("./ollama");
 const CHAT_HISTORY_FILE = path.join(__dirname, "../sessions/chat-history.json");
-
+console.log("Starting electron");
 function createWindow() {
     const win = new BrowserWindow({
         width: 800,
@@ -38,17 +38,22 @@ ipcMain.handle("send-message", async (event, message) => {
     if (!fs.existsSync(CHAT_HISTORY_FILE)) {
         fs.writeFileSync(CHAT_HISTORY_FILE, JSON.stringify([]));
     }
-
+    const userNow = new Date().toISOString();
     const history = JSON.parse(fs.readFileSync(CHAT_HISTORY_FILE));
     const windowedHistory = history.slice(-5);
 
     const response = await callOllamaAPI(message, windowedHistory);
 
-    const userMsg = { sender: "user", text: message, timestamp: new Date() };
-    const aiMsg = { sender: "ai", text: response, timestamp: new Date() };
+    const now = new Date().toISOString(); // String timestamp
+    const userMsg = { sender: "user", text: message, timestamp: userNow };
+    const aiMsg = { sender: "ai", text: response, timestamp: now };
 
     const updatedHistory = [...history, userMsg, aiMsg];
     fs.writeFileSync(CHAT_HISTORY_FILE, JSON.stringify(updatedHistory, null, 2));
+    console.log(
+        "Raw history types:",
+        updatedHistory.map((msg) => typeof msg.timestamp)
+    );
 
     return { aiResponse: response, updatedHistory };
 });
